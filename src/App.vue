@@ -3,7 +3,7 @@ import { RouterLink, RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header class="mx-auto max-w-7xl px-4 py-4 sm:px-6 sm:py-4 lg:px-8 bg-white z-50 sticky top-0">
+  <header class="sticky top-0 py-4 lg:py-6">
     <nav class="grid grid-cols-1 gap-x-4 sm:grid-cols-12 text-center">
       <RouterLink to="/" class="rounded hover:bg-blue-300 duration-300">Home</RouterLink>
       <div class="group block relative rounded hover:bg-blue-300 duration-300">
