@@ -10,12 +10,20 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/tool1',
-      name: 'tool1',
+      path: '/ISMS-210',
+      name: 'ISMS-210',
       // route level code-splitting
       // this generates a separate chunk (About.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import('../views/Tools/Tool-1.vue'),
+      component: () => import('../views/Tools/ISMS-210-view.vue'),
+    },
+    {
+      path: '/draw',
+      name: 'Draw',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/Tools/DrawView.vue'),
     },
   ],
 })

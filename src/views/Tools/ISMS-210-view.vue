@@ -1,118 +1,154 @@
+<script setup lang="ts">
+import { PhotoIcon, UserCircleIcon } from '@heroicons/vue/24/solid'
+import { ChevronDownIcon } from '@heroicons/vue/16/solid'
+
+import { ref, watch } from 'vue'
+import moment from 'moment'
+
+const jirano = ref('')
+const username = ref('')
+const date = ref(moment().format('yyyy-MM-DD'))
+const function_test = ref('')
+const purpose = ref('')
+const description = ref('')
+const selectFile = (event: Event) => {
+  console.log(event)
+  if (event.target) {
+    if (event.target.files) {
+      console.log(event.target.files[0])
+    }
+  }
+}
+</script>
+
 <template>
-  <div class="mx-auto max-w-2xl py-24 sm:py-32">
+  <div class="mx-auto max-w-2xl px-4 py-24 sm:px-6 sm:py-24 lg:px-8 bg-white">
     <form>
       <div class="space-y-12">
         <div class="border-b border-gray-900/10 pb-12">
-          <h2 class="text-base/7 font-semibold text-gray-900">Profile</h2>
+          <h2 class="text-base/7 font-semibold text-gray-900">ISMS-210</h2>
           <p class="mt-1 text-sm/6 text-gray-600">
-            This information will be displayed publicly so be careful what you share.
+            You will create ISMS-210-P416, ISMS-210-P417, ISMS-210-P418, ISMS-210-P419 docx.
           </p>
 
           <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div class="sm:col-span-4">
-              <label for="username" class="block text-sm/6 font-medium text-gray-900"
-                >Username</label
-              >
-              <div class="mt-2">
-                <div
-                  class="flex items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
-                >
-                  <!-- <div class="shrink-0 text-base text-gray-500 select-none sm:text-sm/6">
-                        workcation.com/
-                      </div> -->
-                  <input
-                    type="text"
-                    name="username"
-                    id="username"
-                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-                    placeholder="pyu"
-                  />
-                </div>
-              </div>
-            </div>
-            <div class="sm:col-span-4">
               <label for="jirano" class="block text-sm/6 font-medium text-gray-900">Jirano</label>
               <div class="mt-2">
                 <div
-                  class="flex items-center rounded-md bg-white pl-3 outline outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                  class="flex items-center rounded-md bg-white pl-3 outline-1 outline -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
                 >
                   <input
                     type="text"
                     name="jirano"
                     id="jirano"
                     class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
-                    placeholder="jirno"
+                    placeholder="jirano"
+                    v-model="jirano"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="sm:col-span-4">
+              <label for="username" class="block text-sm/6 font-medium text-gray-900"
+                >UserName</label
+              >
+              <div class="mt-2">
+                <div
+                  class="flex items-center rounded-md bg-white pl-3 outline-1 outline -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                >
+                  <input
+                    type="text"
+                    name="username"
+                    id="username"
+                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                    placeholder="pyu"
+                    v-model="username"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="sm:col-span-4">
+              <label for="date" class="block text-sm/6 font-medium text-gray-900">Date</label>
+              <div class="mt-2">
+                <div
+                  class="flex items-center rounded-md bg-white pl-3 outline-1 outline -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                >
+                  <input
+                    type="date"
+                    name="date"
+                    id="date"
+                    class="block min-w-0 grow py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
+                    v-model="date"
                   />
                 </div>
               </div>
             </div>
 
             <div class="col-span-full">
-              <label for="about" class="block text-sm/6 font-medium text-gray-900">About</label>
+              <label for="function-test" class="block text-sm/6 font-medium text-gray-900"
+                >Function test</label
+              >
               <div class="mt-2">
                 <textarea
-                  name="about"
-                  id="about"
+                  name="function-test"
+                  id="function-test"
                   rows="3"
-                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-                ></textarea>
+                  v-model="function_test"
+                  class="block w-full resize-none rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
               </div>
-              <p class="mt-3 text-sm/6 text-gray-600">Write a few sentences about yourself.</p>
+              <p class="mt-3 text-sm/6 text-gray-600">Write a few sentences about function test.</p>
             </div>
-
             <div class="col-span-full">
-              <label for="photo" class="block text-sm/6 font-medium text-gray-900">Photo</label>
-              <div class="mt-2 flex items-center gap-x-3">
-                <svg
-                  class="size-12 text-gray-300"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  data-slot="icon"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-                <button
-                  type="button"
-                  class="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50"
-                >
-                  Change
-                </button>
+              <label for="purpose" class="block text-sm/6 font-medium text-gray-900">Purpose</label>
+              <div class="mt-2">
+                <textarea
+                  name="purpose"
+                  id="purpose"
+                  rows="3"
+                  v-model="purpose"
+                  class="block w-full resize-none rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
               </div>
+              <!-- <p class="mt-3 text-sm/6 text-gray-600">Write a few sentences about function test.</p> -->
             </div>
-
             <div class="col-span-full">
-              <label for="cover-photo" class="block text-sm/6 font-medium text-gray-900"
-                >Cover photo</label
+              <label for="description" class="block text-sm/6 font-medium text-gray-900"
+                >Description</label
               >
+              <div class="mt-2">
+                <textarea
+                  name="description"
+                  id="description"
+                  rows="3"
+                  v-model="description"
+                  class="block w-full resize-none rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                />
+              </div>
+              <!-- <p class="mt-3 text-sm/6 text-gray-600">Write a few sentences about function test.</p> -->
+            </div>
+
+            <div class="col-span-full">
+              <label for="file-upload" class="block text-sm/6 font-medium text-gray-900">NFR</label>
               <div
                 class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
               >
                 <div class="text-center">
-                  <svg
-                    class="mx-auto size-12 text-gray-300"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                    data-slot="icon"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
+                  <PhotoIcon class="mx-auto size-12 text-gray-300" aria-hidden="true" />
                   <div class="mt-4 flex text-sm/6 text-gray-600">
                     <label
                       for="file-upload"
                       class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500"
                     >
                       <span>Upload a file</span>
-                      <input id="file-upload" name="file-upload" type="file" class="sr-only" />
+                      <input
+                        id="file-upload"
+                        name="file-upload"
+                        @change="selectFile"
+                        type="file"
+                        class="sr-only"
+                      />
                     </label>
                     <p class="pl-1">or drag and drop</p>
                   </div>
@@ -140,7 +176,7 @@
                   name="first-name"
                   id="first-name"
                   autocomplete="given-name"
-                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
@@ -155,7 +191,7 @@
                   name="last-name"
                   id="last-name"
                   autocomplete="family-name"
-                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
@@ -170,7 +206,7 @@
                   name="email"
                   type="email"
                   autocomplete="email"
-                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
@@ -188,19 +224,10 @@
                   <option>Canada</option>
                   <option>Mexico</option>
                 </select>
-                <svg
+                <ChevronDownIcon
                   class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
-                  viewBox="0 0 16 16"
-                  fill="currentColor"
                   aria-hidden="true"
-                  data-slot="icon"
-                >
-                  <path
-                    fill-rule="evenodd"
-                    d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
+                />
               </div>
             </div>
 
@@ -227,7 +254,7 @@
                   name="city"
                   id="city"
                   autocomplete="address-level2"
-                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
@@ -242,7 +269,7 @@
                   name="region"
                   id="region"
                   autocomplete="address-level1"
-                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
@@ -257,7 +284,7 @@
                   name="postal-code"
                   id="postal-code"
                   autocomplete="postal-code"
-                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                  class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 outline -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                 />
               </div>
             </div>
@@ -454,8 +481,3 @@
     </form>
   </div>
 </template>
-
-<script setup lang="ts">
-import { PhotoIcon, UserCircleIcon } from '@heroicons/vue/24/solid'
-import { ChevronDownIcon } from '@heroicons/vue/16/solid'
-</script>

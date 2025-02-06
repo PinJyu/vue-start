@@ -16,7 +16,6 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@microsoft/office-js": "^1.1.105",
     "pinia": "^2.3.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
@@ -39,6 +38,7 @@
     "eslint-plugin-vue": "^9.32.0",
     "jiti": "^2.4.2",
     "jsdom": "^26.0.0",
+    "moment": "^2.30.1",
     "npm-run-all2": "^7.0.2",
     "oxlint": "^0.15.6",
     "postcss": "^8.5.1",
