@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { PhotoIcon, UserCircleIcon } from '@heroicons/vue/24/solid'
 import { ChevronDownIcon } from '@heroicons/vue/16/solid'
+import { DocumentIcon } from '@heroicons/vue/24/outline'
+import { XMarkIcon } from '@heroicons/vue/24/outline'
 
 import { ref, watch } from 'vue'
 import moment from 'moment'
@@ -11,11 +13,39 @@ const date = ref(moment().format('yyyy-MM-DD'))
 const function_test = ref('')
 const purpose = ref('')
 const description = ref('')
-const selectFile = (event: Event) => {
-  console.log(event)
+const changeItemName = ref('')
+
+watch(function_test, (value, old) => {
+  if (purpose.value == old) {
+    purpose.value = value
+  }
+  if (description.value == old) {
+    description.value = value
+  }
+})
+
+watch(purpose, (value, old) => {
+  if (description.value == old) {
+    description.value = value
+  }
+})
+
+const NFR_urls = ref(new Map<string, string>())
+const code_diff_urls = ref(new Map<string, string>())
+
+const selectFile = (urls: Map<String, String>, event: Event) => {
   if (event.target) {
-    if (event.target.files) {
-      console.log(event.target.files[0])
+    const target = event.target as HTMLInputElement
+    if (target.files) {
+      // urls.clear()
+
+      for (let i = 0; i < target.files.length; i++) {
+        const f = target.files[i]
+        target.files[i] = null
+        const url = URL.createObjectURL(f)
+        urls.set(f.name, url)
+      }
+      console.log(NFR_urls.value)
     }
   }
 }
@@ -130,24 +160,71 @@ const selectFile = (event: Event) => {
             </div>
 
             <div class="col-span-full">
-              <label for="file-upload" class="block text-sm/6 font-medium text-gray-900">NFR</label>
-              <div
-                class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
+              <label for="NFR-file-upload" class="block text-sm/6 font-medium text-gray-900"
+                >NFR</label
               >
+              <div
+                class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 py-10 flex-wrap"
+              >
+                <div class="mx-4 w-full flex overflow-x-scroll scroll-pre">
+                  <div v-if="NFR_urls.size === 0" class="py-0 px-3 first:pl-6 last:pr-6 mx-auto">
+                    <div class="flex flex-col items-center justify-center gap-3">
+                      <div class="">
+                        <PhotoIcon class="size-12 text-gray-300" aria-hidden="true" />
+                      </div>
+                      <strong
+                        class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
+                      >
+                        &ensp;
+                      </strong>
+                    </div>
+                  </div>
+
+                  <template v-for="[key, value] of NFR_urls" :key="key">
+                    <div class="py-0 px-3 first:pl-6 last:pr-6">
+                      <div class="flex flex-col items-center justify-center gap-3">
+                        <div class="relative">
+                          <div
+                            class="absolute hover:backdrop-blur-sm size-12 group"
+                            @click="NFR_urls.delete(key)"
+                          >
+                            <XMarkIcon
+                              class="size-12 text-red-500 scale-0 group-hover:scale-100 group-hover:border-2 group-hover:border-red-500 group-hover:rounded-full origin-center duration-300"
+                            />
+                          </div>
+                          <img
+                            v-if="key.endsWith('.webp')"
+                            class="size-12 text-gray-300 border border-gray-3 rounded"
+                            :alt="key"
+                            :src="value"
+                            aria-hidden="true"
+                          />
+                          <DocumentIcon v-else class="size-12 text-gray-300" aria-hidden="true" />
+                        </div>
+                        <strong
+                          class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
+                        >
+                          {{ key }}
+                        </strong>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
                 <div class="text-center">
-                  <PhotoIcon class="mx-auto size-12 text-gray-300" aria-hidden="true" />
-                  <div class="mt-4 flex text-sm/6 text-gray-600">
+                  <div class="mt-2 flex text-sm/6 text-gray-600">
                     <label
-                      for="file-upload"
+                      for="NFR-file-upload"
                       class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500"
                     >
                       <span>Upload a file</span>
                       <input
-                        id="file-upload"
-                        name="file-upload"
-                        @change="selectFile"
+                        id="NFR-file-upload"
+                        name="NFR-file-upload"
+                        @change="selectFile(NFR_urls, $event)"
                         type="file"
                         class="sr-only"
+                        multiple
                       />
                     </label>
                     <p class="pl-1">or drag and drop</p>
@@ -156,6 +233,164 @@ const selectFile = (event: Event) => {
                 </div>
               </div>
             </div>
+
+            <div class="col-span-full">
+              <label for="code-diff-file-upload" class="block text-sm/6 font-medium text-gray-900"
+                >Code diff</label
+              >
+              <div
+                class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 py-10 flex-wrap"
+              >
+                <div class="mx-4 w-full flex overflow-x-scroll scroll-pre">
+                  <div
+                    v-if="code_diff_urls.size === 0"
+                    class="py-0 px-3 first:pl-6 last:pr-6 mx-auto"
+                  >
+                    <div class="flex flex-col items-center justify-center gap-3">
+                      <div class="">
+                        <PhotoIcon class="size-12 text-gray-300" aria-hidden="true" />
+                      </div>
+                      <strong
+                        class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
+                      >
+                        &ensp;
+                      </strong>
+                    </div>
+                  </div>
+
+                  <template v-for="[key, value] of code_diff_urls" :key="key">
+                    <div class="py-0 px-3 first:pl-6 last:pr-6">
+                      <div class="flex flex-col items-center justify-center gap-3">
+                        <div class="relative">
+                          <div
+                            class="absolute hover:backdrop-blur-sm size-12 group"
+                            @click="code_diff_urls.delete(key)"
+                          >
+                            <XMarkIcon
+                              class="size-12 text-red-500 scale-0 group-hover:scale-100 group-hover:border-2 group-hover:border-red-500 group-hover:rounded-full origin-center duration-300"
+                            />
+                          </div>
+                          <img
+                            v-if="key.endsWith('.webp')"
+                            class="size-12 text-gray-300 border border-gray-3 rounded"
+                            :alt="key"
+                            :src="value"
+                            aria-hidden="true"
+                          />
+                          <DocumentIcon v-else class="size-12 text-gray-300" aria-hidden="true" />
+                        </div>
+                        <strong
+                          class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
+                        >
+                          {{ key }}
+                        </strong>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+
+                <div class="text-center">
+                  <div class="mt-2 flex text-sm/6 text-gray-600">
+                    <label
+                      for="code-diff-file-upload"
+                      class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="code-diff-file-upload"
+                        name="code-diff-file-upload"
+                        @change="selectFile(code_diff_urls, $event)"
+                        type="file"
+                        class="sr-only"
+                        multiple
+                      />
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs/5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-span-full">
+              <label for="code-diff-file-upload" class="block text-sm/6 font-medium text-gray-900"
+                >Code diff</label
+              >
+              <div
+                class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
+              >
+                <div class="text-center">
+                  <PhotoIcon class="mx-auto size-12 text-gray-300" aria-hidden="true" />
+                  <div class="mt-4 flex text-sm/6 text-gray-600">
+                    <label
+                      for="code-diff-file-upload"
+                      class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="code-diff-file-upload"
+                        name="code-diff-file-upload"
+                        @change="selectFile"
+                        type="file"
+                        class="sr-only"
+                        multiple
+                      />
+                    </label>
+                    <p class="pl-1">or drag and drop</p>
+                  </div>
+                  <p class="text-xs/5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
+                </div>
+              </div>
+            </div>
+
+            <fieldset class="sm:col-span-full">
+              <legend class="block text-sm/6 font-medium text-gray-900">Changes</legend>
+              <!-- <p class="mt-1 text-sm/6 text-gray-600">
+                These are delivered via SMS to your mobile phone.
+              </p> -->
+              <div class="mt-6 space-x-6 flex">
+                <div class="flex items-center gap-x-3">
+                  <input
+                    id="changes-program"
+                    name="changes"
+                    type="radio"
+                    v-model="changeItemName"
+                    value="program"
+                    checked
+                    class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                  />
+                  <label for="push-everything" class="block text-sm/6 font-medium text-gray-900"
+                    >Program</label
+                  >
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <input
+                    id="changes-file-table"
+                    name="changes"
+                    type="radio"
+                    v-model="changeItemName"
+                    value="file-table"
+                    class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                  />
+                  <label for="push-email" class="block text-sm/6 font-medium text-gray-900"
+                    >File / Table</label
+                  >
+                </div>
+                <div class="flex items-center gap-x-3">
+                  <input
+                    id="changes-report"
+                    name="changes"
+                    type="radio"
+                    v-model="changeItemName"
+                    value="report"
+                    class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                  />
+                  <label for="push-nothing" class="block text-sm/6 font-medium text-gray-900"
+                    >Report</label
+                  >
+                </div>
+              </div>
+            </fieldset>
           </div>
         </div>
 
