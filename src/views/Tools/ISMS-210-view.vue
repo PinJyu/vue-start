@@ -2,9 +2,11 @@
 import { PhotoIcon, UserCircleIcon } from '@heroicons/vue/24/solid'
 import { ChevronDownIcon } from '@heroicons/vue/16/solid'
 import { DocumentIcon } from '@heroicons/vue/24/outline'
-import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { XCircleIcon } from '@heroicons/vue/24/outline'
+import { PlusCircleIcon } from '@heroicons/vue/24/outline'
+import { MinusCircleIcon } from '@heroicons/vue/24/outline'
 
-import { ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import moment from 'moment'
 
 const jirano = ref('')
@@ -13,7 +15,12 @@ const date = ref(moment().format('yyyy-MM-DD'))
 const function_test = ref('')
 const purpose = ref('')
 const description = ref('')
-const changeItemName = ref('')
+const changeItemName = ref('Program')
+const changes = reactive([{ name: '', desc: '' }])
+
+watch(changes, (value) => {
+  console.log(value)
+})
 
 watch(function_test, (value, old) => {
   if (purpose.value == old) {
@@ -34,20 +41,15 @@ const NFR_urls = ref(new Map<string, string>())
 const code_diff_urls = ref(new Map<string, string>())
 
 const selectFile = (urls: Map<String, String>, event: Event) => {
-  if (event.target) {
-    const target = event.target as HTMLInputElement
-    if (target.files) {
-      // urls.clear()
-
-      for (let i = 0; i < target.files.length; i++) {
-        const f = target.files[i]
-        target.files[i] = null
-        const url = URL.createObjectURL(f)
-        urls.set(f.name, url)
-      }
-      console.log(NFR_urls.value)
+  const target = event.target as HTMLInputElement
+  if (target.files) {
+    for (let i = 0; i < target.files.length; i++) {
+      const f = target.files[i]
+      const url = URL.createObjectURL(f)
+      urls.set(f.name, url) // add new file
     }
   }
+  target.value = '' // reset file change
 }
 </script>
 
@@ -167,48 +169,47 @@ const selectFile = (urls: Map<String, String>, event: Event) => {
                 class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 py-10 flex-wrap"
               >
                 <div class="mx-4 w-full flex overflow-x-scroll scroll-pre">
-                  <div v-if="NFR_urls.size === 0" class="py-0 px-3 first:pl-6 last:pr-6 mx-auto">
-                    <div class="flex flex-col items-center justify-center gap-3">
-                      <div class="">
-                        <PhotoIcon class="size-12 text-gray-300" aria-hidden="true" />
-                      </div>
-                      <strong
-                        class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
-                      >
-                        &ensp;
-                      </strong>
-                    </div>
-                  </div>
-
-                  <template v-for="[key, value] of NFR_urls" :key="key">
-                    <div class="py-0 px-3 first:pl-6 last:pr-6">
+                  <TransitionGroup name="fade">
+                    <div v-if="NFR_urls.size === 0" class="py-0 px-3 first:pl-6 last:pr-6 mx-auto">
                       <div class="flex flex-col items-center justify-center gap-3">
-                        <div class="relative">
-                          <div
-                            class="absolute hover:backdrop-blur-sm size-12 group"
-                            @click="NFR_urls.delete(key)"
-                          >
-                            <XMarkIcon
-                              class="size-12 text-red-500 scale-0 group-hover:scale-100 group-hover:border-2 group-hover:border-red-500 group-hover:rounded-full origin-center duration-300"
-                            />
-                          </div>
-                          <img
-                            v-if="key.endsWith('.webp')"
-                            class="size-12 text-gray-300 border border-gray-3 rounded"
-                            :alt="key"
-                            :src="value"
-                            aria-hidden="true"
-                          />
-                          <DocumentIcon v-else class="size-12 text-gray-300" aria-hidden="true" />
+                        <div class="">
+                          <PhotoIcon class="size-12 text-gray-300" aria-hidden="true" />
                         </div>
                         <strong
                           class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
                         >
-                          {{ key }}
+                          &ensp;
                         </strong>
                       </div>
                     </div>
-                  </template>
+                    <template v-for="[key, value] of NFR_urls" :key="key">
+                      <div class="py-0 px-3 first:pl-6 last:pr-6">
+                        <div class="flex flex-col items-center justify-center gap-3">
+                          <div class="relative">
+                            <div class="absolute hover:backdrop-blur-sm size-12 group grid">
+                              <XCircleIcon
+                                @click="NFR_urls.delete(key)"
+                                class="place-self-center size-8 ease-in-out text-red-500 scale-0 group-hover:scale-100 origin-center duration-300 cursor-pointer"
+                              />
+                            </div>
+                            <img
+                              v-if="key.endsWith('.webp')"
+                              class="size-12 text-gray-300 border border-gray-3 rounded"
+                              :alt="key"
+                              :src="value"
+                              aria-hidden="true"
+                            />
+                            <DocumentIcon v-else class="size-12 text-gray-300" aria-hidden="true" />
+                          </div>
+                          <strong
+                            class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
+                          >
+                            {{ key }}
+                          </strong>
+                        </div>
+                      </div>
+                    </template>
+                  </TransitionGroup>
                 </div>
 
                 <div class="text-center">
@@ -242,51 +243,53 @@ const selectFile = (urls: Map<String, String>, event: Event) => {
                 class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 py-10 flex-wrap"
               >
                 <div class="mx-4 w-full flex overflow-x-scroll scroll-pre">
-                  <div
-                    v-if="code_diff_urls.size === 0"
-                    class="py-0 px-3 first:pl-6 last:pr-6 mx-auto"
-                  >
-                    <div class="flex flex-col items-center justify-center gap-3">
-                      <div class="">
-                        <PhotoIcon class="size-12 text-gray-300" aria-hidden="true" />
-                      </div>
-                      <strong
-                        class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
-                      >
-                        &ensp;
-                      </strong>
-                    </div>
-                  </div>
-
-                  <template v-for="[key, value] of code_diff_urls" :key="key">
-                    <div class="py-0 px-3 first:pl-6 last:pr-6">
+                  <TransitionGroup name="fade">
+                    <div
+                      v-if="code_diff_urls.size === 0"
+                      class="py-0 px-3 first:pl-6 last:pr-6 mx-auto"
+                    >
                       <div class="flex flex-col items-center justify-center gap-3">
-                        <div class="relative">
-                          <div
-                            class="absolute hover:backdrop-blur-sm size-12 group"
-                            @click="code_diff_urls.delete(key)"
-                          >
-                            <XMarkIcon
-                              class="size-12 text-red-500 scale-0 group-hover:scale-100 group-hover:border-2 group-hover:border-red-500 group-hover:rounded-full origin-center duration-300"
-                            />
-                          </div>
-                          <img
-                            v-if="key.endsWith('.webp')"
-                            class="size-12 text-gray-300 border border-gray-3 rounded"
-                            :alt="key"
-                            :src="value"
-                            aria-hidden="true"
-                          />
-                          <DocumentIcon v-else class="size-12 text-gray-300" aria-hidden="true" />
+                        <div class="">
+                          <PhotoIcon class="size-12 text-gray-300" aria-hidden="true" />
                         </div>
                         <strong
                           class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
                         >
-                          {{ key }}
+                          &ensp;
                         </strong>
                       </div>
                     </div>
-                  </template>
+
+                    <template v-for="[key, value] of code_diff_urls" :key="key">
+                      <div class="py-0 px-3 first:pl-6 last:pr-6">
+                        <div class="flex flex-col items-center justify-center gap-3">
+                          <div class="relative">
+                            <div
+                              class="absolute hover:backdrop-blur-sm size-12 group grid"
+                              @click="code_diff_urls.delete(key)"
+                            >
+                              <XCircleIcon
+                                class="place-self-center ease-in-out size-8 text-red-500 scale-0 group-hover:scale-100 origin-center duration-300 cursor-pointer"
+                              />
+                            </div>
+                            <img
+                              v-if="key.endsWith('.webp')"
+                              class="size-12 text-gray-300 border border-gray-3 rounded"
+                              :alt="key"
+                              :src="value"
+                              aria-hidden="true"
+                            />
+                            <DocumentIcon v-else class="size-12 text-gray-300" aria-hidden="true" />
+                          </div>
+                          <strong
+                            class="text-slate-900 w-12 h-4 truncate text-xs font-medium dark:text-slate-200"
+                          >
+                            {{ key }}
+                          </strong>
+                        </div>
+                      </div>
+                    </template>
+                  </TransitionGroup>
                 </div>
 
                 <div class="text-center">
@@ -311,83 +314,126 @@ const selectFile = (urls: Map<String, String>, event: Event) => {
                 </div>
               </div>
             </div>
-
-            <div class="col-span-full">
-              <label for="code-diff-file-upload" class="block text-sm/6 font-medium text-gray-900"
-                >Code diff</label
-              >
-              <div
-                class="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10"
-              >
-                <div class="text-center">
-                  <PhotoIcon class="mx-auto size-12 text-gray-300" aria-hidden="true" />
-                  <div class="mt-4 flex text-sm/6 text-gray-600">
-                    <label
-                      for="code-diff-file-upload"
-                      class="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500"
-                    >
-                      <span>Upload a file</span>
-                      <input
-                        id="code-diff-file-upload"
-                        name="code-diff-file-upload"
-                        @change="selectFile"
-                        type="file"
-                        class="sr-only"
-                        multiple
-                      />
-                    </label>
-                    <p class="pl-1">or drag and drop</p>
-                  </div>
-                  <p class="text-xs/5 text-gray-600">PNG, JPG, GIF up to 10MB</p>
-                </div>
-              </div>
-            </div>
-
             <fieldset class="sm:col-span-full">
               <legend class="block text-sm/6 font-medium text-gray-900">Changes</legend>
               <!-- <p class="mt-1 text-sm/6 text-gray-600">
                 These are delivered via SMS to your mobile phone.
               </p> -->
-              <div class="mt-6 space-x-6 flex">
-                <div class="flex items-center gap-x-3">
-                  <input
-                    id="changes-program"
-                    name="changes"
-                    type="radio"
-                    v-model="changeItemName"
-                    value="program"
-                    checked
-                    class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
-                  />
-                  <label for="push-everything" class="block text-sm/6 font-medium text-gray-900"
-                    >Program</label
-                  >
+              <div
+                class="mt-6 sm:col-span-full border rounded-lg border-gray-300 bg-slate-50 p-4 space-y-4"
+              >
+                <div class="space-x-6 flex">
+                  <div class="flex items-center gap-x-3">
+                    <input
+                      id="changes-program"
+                      name="changes"
+                      type="radio"
+                      v-model="changeItemName"
+                      value="Program"
+                      checked
+                      class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                    />
+                    <label for="changes-program" class="block text-sm/6 font-medium text-gray-900"
+                      >Program</label
+                    >
+                  </div>
+                  <div class="flex items-center gap-x-3">
+                    <input
+                      id="changes-file-table"
+                      name="changes"
+                      type="radio"
+                      v-model="changeItemName"
+                      value="File/Table"
+                      class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                    />
+                    <label
+                      for="changes-file-table"
+                      class="block text-sm/6 font-medium text-gray-900"
+                      >File / Table</label
+                    >
+                  </div>
+                  <div class="flex items-center gap-x-3">
+                    <input
+                      id="changes-report"
+                      name="changes"
+                      type="radio"
+                      v-model="changeItemName"
+                      value="Report"
+                      class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
+                    />
+                    <label for="changes-report" class="block text-sm/6 font-medium text-gray-900"
+                      >Report</label
+                    >
+                  </div>
                 </div>
-                <div class="flex items-center gap-x-3">
-                  <input
-                    id="changes-file-table"
-                    name="changes"
-                    type="radio"
-                    v-model="changeItemName"
-                    value="file-table"
-                    class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
-                  />
-                  <label for="push-email" class="block text-sm/6 font-medium text-gray-900"
-                    >File / Table</label
-                  >
-                </div>
-                <div class="flex items-center gap-x-3">
-                  <input
-                    id="changes-report"
-                    name="changes"
-                    type="radio"
-                    v-model="changeItemName"
-                    value="report"
-                    class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
-                  />
-                  <label for="push-nothing" class="block text-sm/6 font-medium text-gray-900"
-                    >Report</label
-                  >
+                <div class="mx-auto border rounded-lg shadow-sm">
+                  <div class="mt-2">
+                    <table class="border-collapse w-full text-sm">
+                      <thead>
+                        <tr class="">
+                          <td class="border-b font-medium py-2 px-4 text-slate-400 text-left">
+                            Num
+                          </td>
+                          <td class="border-b font-medium py-2 px-4 text-slate-400 text-left">
+                            {{ changeItemName }} Name
+                          </td>
+                          <td class="border-b font-medium py-2 px-4 text-slate-400 text-left">
+                            Description
+                          </td>
+                        </tr>
+                      </thead>
+                      <tbody class="bg-white">
+                        <TransitionGroup name="fade">
+                          <template v-for="n in changes.length" :key="n">
+                            <tr class="border-b border-slate-100 last:border-slate-200">
+                              <td
+                                class="relative group font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                              >
+                                <span class="group-hover:opacity-0 duration-300">
+                                  {{ n }}
+                                </span>
+                                <div
+                                  class="absolute grid top-0 left-0 grid-rows-2 grid-cols-2 scale-0 group-hover:scale-100 origin-center duration-300"
+                                >
+                                  <div class="row-span-1 cursor-pointer bg-indigo-200"></div>
+                                  <div class="row-span-2 cursor-pointer bg-red-200">nihao</div>
+                                  <div class="row-span-1 cursor-pointer bg-indigo-200">nihao</div>
+                                </div>
+                              </td>
+                              <td
+                                class="font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                              >
+                                <input
+                                  :id="'t_c_1_r' + n"
+                                  type="text"
+                                  class="w-full outline-none placeholder:italic placeholder:text-slate-300"
+                                  v-model="changes[n - 1].name"
+                                  placeholder="Write Something..."
+                                />
+                              </td>
+                              <td
+                                class="font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                              >
+                                <input
+                                  :id="'t_c_2_r' + n"
+                                  type="text"
+                                  class="w-full outline-none text-slate-400 placeholder:italic placeholder:text-slate-300"
+                                  v-model="changes[n - 1].desc"
+                                  placeholder="Write Something..."
+                                />
+                              </td>
+                            </tr>
+                          </template>
+                        </TransitionGroup>
+                      </tbody>
+                    </table>
+                    <div class="py-2">
+                      <PlusCircleIcon
+                        @click="changes.push({ name: '', desc: '' })"
+                        class="mx-auto size-6 text-gray-300 hover:text-indigo-500 duration-300 cursor-pointer"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </fieldset>
@@ -716,3 +762,25 @@ const selectFile = (urls: Map<String, String>, event: Event) => {
     </form>
   </div>
 </template>
+
+<style lang="css" scoped>
+/* 1. 声明过渡效果 */
+.fade-move,
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.5s cubic-bezier(0.55, 0, 0.1, 1);
+}
+
+/* 2. 声明进入和离开的状态 */
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: scaleY(0.01) translate(30px, 0);
+}
+
+/* 3. 确保离开的项目被移除出了布局流
+      以便正确地计算移动时的动画效果。 */
+.fade-leave-active {
+  position: absolute;
+}
+</style>
