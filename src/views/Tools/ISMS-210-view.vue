@@ -6,7 +6,7 @@ import { XCircleIcon } from '@heroicons/vue/24/outline'
 import { PlusCircleIcon } from '@heroicons/vue/24/outline'
 import { MinusCircleIcon } from '@heroicons/vue/24/outline'
 
-import { reactive, ref, watch } from 'vue'
+import { nextTick, reactive, ref, watch } from 'vue'
 import moment from 'moment'
 
 const jirano = ref('')
@@ -16,7 +16,7 @@ const function_test = ref('')
 const purpose = ref('')
 const description = ref('')
 const changeItemName = ref('Program')
-const changes = reactive([{ name: '', desc: '' }])
+const changes = reactive([{ name: '', desc: '', timeStamp: Date.now() }])
 
 watch(changes, (value) => {
   console.log(value)
@@ -50,6 +50,27 @@ const selectFile = (urls: Map<String, String>, event: Event) => {
     }
   }
   target.value = '' // reset file change
+}
+
+const animation_click = async (event: Event) => {
+  const target = event.target as HTMLElement
+  if (target) {
+    target.classList.add('origin-center')
+    console.log(target.getAnimations())
+    await target.animate(
+      [
+        { offset: 0.25, transform: 'scale(0.0)' },
+        { offset: 0.5, transform: 'scale(0.5)' },
+        { offset: 0.6, transform: 'scale(1.1)' },
+        { offset: 1, transform: 'scale(1)' },
+      ],
+
+      {
+        duration: 300,
+        easing: 'ease-in-out',
+      },
+    ).finished
+  }
 }
 </script>
 
@@ -384,52 +405,88 @@ const selectFile = (urls: Map<String, String>, event: Event) => {
                       </thead>
                       <tbody class="bg-white">
                         <TransitionGroup name="fade">
-                          <template v-for="n in changes.length" :key="n">
-                            <tr class="border-b border-slate-100 last:border-slate-200">
-                              <td
-                                class="relative group font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                          <tr
+                            v-for="(item, n) in changes"
+                            class="border-b border-slate-100 last:border-slate-200"
+                            :key="item.timeStamp"
+                          >
+                            <td
+                              class="relative group font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                            >
+                              <span class="group-hover:opacity-0 duration-300">
+                                {{ n + 1 }}
+                              </span>
+                              <div
+                                class="absolute size-full grid top-0 left-0 grid-rows-2 grid-cols-2 gap-[0.125rem] scale-0 group-hover:scale-100 origin-center duration-1000"
                               >
-                                <span class="group-hover:opacity-0 duration-300">
-                                  {{ n }}
-                                </span>
-                                <div
-                                  class="absolute grid top-0 left-0 grid-rows-2 grid-cols-2 scale-0 group-hover:scale-100 origin-center duration-300"
-                                >
-                                  <div class="row-span-1 cursor-pointer bg-indigo-200"></div>
-                                  <div class="row-span-2 cursor-pointer bg-red-200">nihao</div>
-                                  <div class="row-span-1 cursor-pointer bg-indigo-200">nihao</div>
+                                <div class="row-span-1">
+                                  <PlusCircleIcon
+                                    @click="
+                                      changes.splice(n, 0, {
+                                        name: '',
+                                        desc: '',
+                                        timeStamp: Date.now(),
+                                      })
+                                    "
+                                    class="cursor-pointer size-full text-indigo-200 hover:text-indigo-500"
+                                  />
                                 </div>
-                              </td>
-                              <td
-                                class="font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
-                              >
-                                <input
-                                  :id="'t_c_1_r' + n"
-                                  type="text"
-                                  class="w-full outline-none placeholder:italic placeholder:text-slate-300"
-                                  v-model="changes[n - 1].name"
-                                  placeholder="Write Something..."
-                                />
-                              </td>
-                              <td
-                                class="font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
-                              >
-                                <input
-                                  :id="'t_c_2_r' + n"
-                                  type="text"
-                                  class="w-full outline-none text-slate-400 placeholder:italic placeholder:text-slate-300"
-                                  v-model="changes[n - 1].desc"
-                                  placeholder="Write Something..."
-                                />
-                              </td>
-                            </tr>
-                          </template>
+                                <div class="row-span-2">
+                                  <MinusCircleIcon
+                                    @click="changes.splice(n, 1)"
+                                    class="cursor-pointer size-full text-red-200 hover:text-red-500"
+                                  />
+                                </div>
+                                <div class="row-span-1">
+                                  <PlusCircleIcon
+                                    @click="
+                                      changes.splice(n + 1, 0, {
+                                        name: '',
+                                        desc: '',
+                                        timeStamp: Date.now(),
+                                      })
+                                    "
+                                    class="cursor-pointer size-full text-indigo-200 hover:text-indigo-500"
+                                  />
+                                </div>
+                              </div>
+                            </td>
+                            <td
+                              class="font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                            >
+                              <input
+                                :id="'t_c_1_r' + n"
+                                type="text"
+                                class="w-full outline-none placeholder:italic placeholder:text-slate-300 placeholder:text-xs"
+                                v-model="item.name"
+                                placeholder="Write Something..."
+                              />
+                            </td>
+                            <td
+                              class="font-medium py-2 px-4 text-slate-400 text-left focus-within:rounded focus-within:outline focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
+                            >
+                              <input
+                                :id="'t_c_2_r' + n"
+                                type="text"
+                                class="w-full outline-none placeholder:italic placeholder:text-slate-300 placeholder:text-xs"
+                                v-model="item.desc"
+                                placeholder="Write Something..."
+                              />
+                            </td>
+                            <!-- <td>{{ item.timeStamp }}</td> -->
+                          </tr>
                         </TransitionGroup>
                       </tbody>
                     </table>
                     <div class="py-2">
                       <PlusCircleIcon
-                        @click="changes.push({ name: '', desc: '' })"
+                        @click="
+                          ($event) => {
+                            animation_click($event).then(() =>
+                              changes.push({ name: '', desc: '', timeStamp: Date.now() }),
+                            )
+                          }
+                        "
                         class="mx-auto size-6 text-gray-300 hover:text-indigo-500 duration-300 cursor-pointer"
                       />
                     </div>

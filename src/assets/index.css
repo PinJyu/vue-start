@@ -32,4 +32,20 @@
       }
     }
   }
+
+  .svgclick {
+    animation: shot 500ms ease-in-out;
+  }
+
+  @keyframes shot {
+    25% {
+      transform: scale(0.5);
+    }
+    80% {
+      transform: scale(1.25);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
 }
